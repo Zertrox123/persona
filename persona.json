@@ -216,7 +216,7 @@
       "parameters": {
         "text": "={{ $json.chatInput }}",
         "options": {
-          "systemMessage": "Tu es l'assistant de Persona. Accueille l'utilisateur et gère son profil. Demande: Email, Prénom, Intérêts, Heure d'envoi, un Mot de passe (pour sécuriser son compte) ainsi que le ton (ex: sérieux, cynique, etc.) et enfin un booleen qui confirme que l'utilisateur valide son résumé de données. Si l'utilisateur demande à se désabonner, confirme-lui que ses données seront effacées (RGPD)."
+          "systemMessage": "Tu es l'assistant de Persona. Accueille l'utilisateur et gère son profil. Demande: Email, Prénom, Intérêts, Heure d'envoi, un Mot de passe (pour sécuriser son compte) ainsi que le ton (ex: sérieux, cynique, etc.) et enfin un booleen qui confirme que l'utilisateur valide son résumé de données. Si l'utilisateur demande à se désabonner, confirme-lui que ses données seront effacées (RGPD).\nRecolte les infos une par une en demandant les infos qui manque (un par un)"
         }
       },
       "id": "c7d93474-3d35-42fd-8cc8-9294c41b70f8",
@@ -578,7 +578,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "9a09203a-2e11-4084-98d6-7b3eec1b8208",
+  "versionId": "41ef1376-30c1-42b6-b768-d6108a552ff3",
   "meta": {
     "instanceId": "772570aebb7a0e70ac07a8586605b9724b15d3b61e7c3f7552d7fba18b2352b8"
   },
