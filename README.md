@@ -1,4 +1,4 @@
-# 📰 Persona — Votre Agrégateur d'Actualités IA sur-mesure
+# Persona
 
 Salut ! Bienvenue sur le dépôt de **Persona**. 
 
@@ -8,7 +8,7 @@ L'intégralité de ce projet a été pensée et construite avec **n8n** (sans co
 
 ---
 
-## 🛠️ Sous le capot (Architecture)
+## Architecture
 
 Comment ça marche concrètement ? Le workflow se divise en deux grandes parties :
 
@@ -17,7 +17,7 @@ Comment ça marche concrètement ? Le workflow se divise en deux grandes parties
 
 ---
 
-## ✨ Ce qui est en place (Fonctionnalités)
+## Fonctionnalités
 
 Nous avons respecté à la lettre le cahier des charges (les "Musts"), et même un peu plus :
 
@@ -32,7 +32,7 @@ Nous avons respecté à la lettre le cahier des charges (les "Musts"), et même 
 
 ---
 
-## 🔒 Sécurité & RGPD (Parce qu'on ne rigole pas avec les données)
+## Sécurité & RGPD
 
 Ce projet a été pensé pour le marché européen, la gestion des données est donc prise très au sérieux :
 
@@ -42,7 +42,7 @@ Ce projet a été pensé pour le marché européen, la gestion des données est 
 
 ---
 
-## 🚀 Envie de tester ? (Installation)
+## Installation
 
 Pour faire tourner Persona sur votre machine, voici la marche à suivre :
 
@@ -58,5 +58,5 @@ Pour faire tourner Persona sur votre machine, voici la marche à suivre :
 
 ---
 
-### 👨‍💻 Auteur
+### Auteur
 **Omar Joudi** — Epitech Lyon
