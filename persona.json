@@ -36,7 +36,9 @@
       }
     },
     {
-      "parameters": {},
+      "parameters": {
+        "contextWindowLength": 10
+      },
       "id": "ae27ed32-ec55-434a-a29d-d3d24a15f50f",
       "name": "Window Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
@@ -92,7 +94,7 @@
     },
     {
       "parameters": {
-        "model": "gpt-4o-mini",
+        "model": "=gpt-oss-20b",
         "options": {}
       },
       "id": "d44bdeef-935b-49b2-9384-788d93fc6808",
@@ -102,7 +104,13 @@
       "position": [
         -240,
         752
-      ]
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "mp8vSbft1BNWv5on",
+          "name": "OpenAI account"
+        }
+      }
     },
     {
       "parameters": {
@@ -261,7 +269,8 @@
             {
               "name": "est_valide",
               "type": "boolean",
-              "description": "Si l'utilsiateur a validé son choix"
+              "description": "Si l'utilisateur a validé son choix ou non",
+              "required": true
             }
           ]
         },
@@ -578,7 +587,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "41ef1376-30c1-42b6-b768-d6108a552ff3",
+  "versionId": "1f95dc31-0168-43fe-8e36-2aed3d683d72",
   "meta": {
     "instanceId": "772570aebb7a0e70ac07a8586605b9724b15d3b61e7c3f7552d7fba18b2352b8"
   },
