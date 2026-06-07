@@ -1,62 +1,61 @@
-# Persona
+# Persona — Agrégateur d'Actualités IA sur-mesure
 
-Salut ! Bienvenue sur le dépôt de **Persona**. 
+Salut et bienvenue sur le dépôt de Persona. 
 
-L'idée derrière ce projet est simple : nous passons trop de temps à scroller pour trouver l'information qui nous intéresse vraiment. Persona règle ce problème en étant un agrégateur d'actualités 100 % personnalisé et automatisé, sans aucune interface lourde. Tout se passe via une simple discussion avec un chatbot, et la magie opère en coulisses pour vous livrer une newsletter sur-mesure, à l'heure que vous voulez.
+L'idée derrière ce projet est née d'un constat simple : nous passons trop de temps à trier l'information pour trouver ce qui nous intéresse vraiment. Persona est une solution automatisée qui règle ce problème en se débarrassant complètement de l'interface utilisateur classique. 
 
-L'intégralité de ce projet a été pensée et construite avec **n8n** (sans code backend traditionnel ni interface utilisateur frontend).
-
----
-
-## Architecture
-
-Comment ça marche concrètement ? Le workflow se divise en deux grandes parties :
-
-1. **L'Onboarding (Le Chatbot) :** Un agent IA conversationnel accueille l'utilisateur, discute avec lui pour comprendre ses besoins (nom, email, centres d'intérêt, heure de réception souhaitée) et extrait ces données de façon structurée pour les stocker en base de données.
-2. **L'Usine à News (L'Automatisation) :** À l'heure prévue, le système se réveille. Il va lire plusieurs flux RSS (Google News, France 24, etc.) en fonction des intérêts de l'utilisateur, demande à une IA de jouer au rédacteur en chef pour trier et résumer les meilleurs articles, et envoie le tout via un bel e-mail HTML.
+Tout le système repose sur n8n. L'interaction se fait uniquement via une discussion naturelle avec un chatbot. L'agent conversationnel comprend vos centres d'intérêt, enregistre vos préférences, et une automatisation se charge d'aller lire la presse, de faire trier les articles par une IA, et de vous envoyer une newsletter HTML sur-mesure dans votre boîte mail.
 
 ---
 
-## Fonctionnalités
+## Ce qui fonctionne actuellement
 
-Nous avons respecté à la lettre le cahier des charges (les "Musts"), et même un peu plus :
-
-- **Point d'entrée unique :** Tout se gère depuis l'interface de chat.
-- **Profilage IA :** Extraction intelligente des données utilisateurs en langage naturel.
-- **Multi-sources :** Récupération d'articles depuis plusieurs flux RSS combinés.
-- **Curation sur-mesure :** Filtrage et résumé des actualités par l'IA selon le profil.
-- **Mise en page HTML :** Fini le texte brut, la newsletter est formatée proprement.
-- **Mémoire de session :** Le chatbot se souvient du contexte de la discussion.
-
-*Dans les cartons (À venir) :* L'ajout d'une régie publicitaire ciblée, la vérification des faits (fact-checking) via des outils externes de l'agent, et la diffusion multicanal (Discord/Telegram).
+Ce prototype couvre les exigences principales du projet :
+- Un point d'entrée unique via le chat.
+- L'extraction intelligente des données utilisateurs (nom, email, intérêts) en langage naturel.
+- La récupération d'actualités depuis de multiples flux RSS combinés.
+- Une curation personnalisée par l'IA (tri des articles selon le profil et rédaction).
+- Un envoi automatisé d'e-mails au format HTML.
+- Le respect des directives RGPD de base avec un flux de désabonnement prévu dans la base de données.
 
 ---
 
-## Sécurité & RGPD
+## Guide d'installation et de configuration (Setup)
 
-Ce projet a été pensé pour le marché européen, la gestion des données est donc prise très au sérieux :
+Pour que ce workflow fonctionne sur votre machine, il a besoin de se connecter à trois éléments extérieurs : une mémoire (la base de données), un cerveau (OpenAI), et un facteur (Gmail). Le fichier d'export ayant été anonymisé pour des raisons de sécurité, vous devrez fournir vos propres clés.
 
-- **Contre les acteurs malveillants :** Le prompt de l'IA inclut des directives strictes contre la "Prompt Injection". L'architecture prévoit également une vérification (mot de passe/hash) pour éviter qu'un utilisateur ne modifie les données d'un autre.
-- **RGPD :** Les données (email, intérêts) ne sont collectées qu'après validation explicite de l'utilisateur. Un flux de désabonnement permet la suppression totale des données de l'utilisateur en base s'il le demande au chatbot.
-- **Anonymisation :** Le fichier d'export du workflow (`persona.json`) a été purgé de tous les identifiants, tokens d'API et clés secrètes avant d'être partagé.
+Voici la marche à suivre pas à pas.
+
+### 1. Importer la logique
+Lancez votre instance n8n locale (généralement accessible sur localhost:5678). Allez dans la section des workflows, choisissez d'importer un projet depuis un fichier, et sélectionnez le fichier persona.json fourni dans ce dépôt.
+
+### 2. Configurer la base de données (Supabase)
+Le projet utilise des nœuds PostgreSQL pour stocker les profils. La méthode recommandée et la plus rapide est d'utiliser Supabase.
+
+1. Créez un projet gratuit sur Supabase. Prenez soin de bien noter le mot de passe de la base de données que vous créez à cette étape.
+2. Allez dans l'éditeur SQL de Supabase et exécutez la requête suivante pour préparer votre table :
+   `CREATE TABLE users (id SERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, interests TEXT, send_time TEXT, password TEXT);`
+3. Allez dans les paramètres de base de données de Supabase pour récupérer vos identifiants de connexion (l'URL du Host et l'utilisateur). Privilégiez l'adresse de "Connection pooling" avec le port 6543.
+4. Dans n8n, ouvrez un des nœuds Postgres, créez un nouveau "Credential" et collez vos informations. Point crucial : n'oubliez pas d'activer l'option "Ignore SSL Issues" tout en bas de la fenêtre de configuration n8n pour autoriser la connexion.
+
+### 3. Connecter l'IA (OpenAI)
+1. Connectez-vous à votre espace développeur OpenAI et générez une nouvelle clé API (Secret Key).
+2. Dans n8n, allez dans l'onglet Credentials, cherchez "OpenAI API" et collez votre clé. 
+3. Retournez dans le workflow et assurez-vous que les deux nœuds "OpenAI Model" utilisent bien ce nouveau credential.
+
+### 4. Configurer l'envoi d'e-mails (Gmail OAuth2)
+Google demande un peu plus de configuration pour autoriser n8n à envoyer des e-mails en votre nom.
+
+1. Allez sur la console Google Cloud et créez de nouveaux identifiants OAuth 2.0. Choisissez le type "Application Web".
+2. Dans les URI de redirection autorisés, ajoutez l'adresse de callback de votre n8n (par défaut : http://localhost:5678/rest/oauth2-credential/callback).
+3. Important : Votre application Google Cloud étant en mode test, allez dans l'écran de consentement OAuth et ajoutez votre propre adresse e-mail dans la liste des utilisateurs de test (Test users). Sans cela, Google bloquera la connexion.
+4. Copiez le Client ID et le Client Secret, collez-les dans les credentials Gmail sur n8n, et cliquez sur le bouton de connexion pour lier votre compte.
+
+### 5. Lancement
+Une fois tous les identifiants au vert, activez le workflow en haut à droite de l'écran n8n. Ouvrez l'URL fournie par le nœud "Chatbot Trigger", dites bonjour à l'assistant, et laissez-vous guider !
 
 ---
 
-## Installation
+## Auteur
 
-Pour faire tourner Persona sur votre machine, voici la marche à suivre :
-
-### Prérequis
-- Une instance **n8n** qui tourne en local (sur `localhost:5678`).
-- Une clé API **OpenAI** (ou un autre modèle LLM compatible).
-- Un projet Google Cloud avec l'API **Gmail** activée et des identifiants OAuth 2.0 (Type : Application Web).
-
-### Configuration rapide
-1. **Importez la logique :** Dans n8n, allez dans *Workflows → Import from file* et sélectionnez le fichier `persona.json`.
-2. **Branchez les tuyaux :** Allez dans l'onglet *Credentials* de n8n et configurez vos clés pour OpenAI et Gmail OAuth2. *(Pensez à bien mettre `http://localhost:5678/rest/oauth2-credential/callback` dans les URI de redirection sur Google Cloud).*
-3. **Activez le tout :** Passez le workflow en "Active" en haut à droite. Ouvrez l'URL du Chat Trigger et commencez à discuter avec l'agent !
-
----
-
-### Auteur
-**Omar Joudi** — Epitech Lyon
+**Omar Joudi** — Epitech Lyon, Expert en ingénierie logicielle (RNCP Niveau 7)

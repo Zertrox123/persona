@@ -102,8 +102,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        -240,
-        752
+        -128,
+        720
       ],
       "credentials": {
         "openAiApi": {
@@ -124,8 +124,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
       "position": [
-        144,
-        688
+        352,
+        672
       ],
       "webhookId": "21b85cbd-1ea3-43c5-b7ca-2030510edcdb",
       "credentials": {
@@ -137,6 +137,7 @@
     },
     {
       "parameters": {
+        "text": "={{ JSON.stringify($json.data) }}",
         "options": {
           "systemMessage": "Tu es un journaliste. Revois ces articles, fais un fact-check rapide (élimine ce qui semble trop satirique), choisis les 3 meilleurs liés aux intérêts de l'utilisateur ({{ $('boucle').item.json.interests }}), et rédige une belle newsletter au format HTML pur. Ajoute un lien de désabonnement à la fin."
         }
@@ -146,8 +147,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1,
       "position": [
-        -192,
-        576
+        -16,
+        528
       ]
     },
     {
@@ -160,22 +161,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -416,
-        608
-      ]
-    },
-    {
-      "parameters": {
-        "url": "https://www.france24.com/fr/rss",
-        "options": {}
-      },
-      "id": "59816b0b-bfec-47d4-87ee-8623ee6eb42c",
-      "name": "france24",
-      "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "position": [
-        -624,
-        704
+        -224,
+        544
       ]
     },
     {
@@ -208,7 +195,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT email, interests FROM users WHERE send_time = EXTRACT(HOUR FROM NOW()) -- MOCK NODE",
+        "query": "SELECT email, interests FROM users WHERE SPLIT_PART(send_time, ':', 1)::numeric = EXTRACT(HOUR FROM NOW())",
         "options": {}
       },
       "id": "d4391e67-5618-4c2f-92c1-e111db9174c7",
@@ -218,13 +205,19 @@
       "position": [
         -1072,
         688
-      ]
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5mZlvVx7096fnYAr",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
         "text": "={{ $json.chatInput }}",
         "options": {
-          "systemMessage": "Tu es l'assistant de Persona. Accueille l'utilisateur et gère son profil. Demande: Email, Prénom, Intérêts, Heure d'envoi, un Mot de passe (pour sécuriser son compte) ainsi que le ton (ex: sérieux, cynique, etc.) et enfin un booleen qui confirme que l'utilisateur valide son résumé de données. Si l'utilisateur demande à se désabonner, confirme-lui que ses données seront effacées (RGPD).\nRecolte les infos une par une en demandant les infos qui manque (un par un)"
+          "systemMessage": "Tu es l'assistant de Persona. Accueille l'utilisateur et gère son profil. Avant tout, demande si l'utilisateur souhaite s'inscrire ou se déconnecter. Demande: Email, Prénom, Intérêts, Heure d'envoi, un Mot de passe (pour sécuriser son compte) ainsi que le ton (ex: sérieux, cynique, etc.) et enfin un booleen qui confirme que l'utilisateur valide son résumé de données. Si l'utilisateur demande à se désabonner, confirme-lui que ses données seront effacées (RGPD).\nRecolte les infos une par une en demandant les infos qui manque (un par un)"
         }
       },
       "id": "c7d93474-3d35-42fd-8cc8-9294c41b70f8",
@@ -298,7 +291,13 @@
       "position": [
         256,
         176
-      ]
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5mZlvVx7096fnYAr",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -313,7 +312,13 @@
       "position": [
         256,
         -32
-      ]
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5mZlvVx7096fnYAr",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -372,6 +377,46 @@
       ],
       "id": "b040c108-e05a-4718-abfb-a87e7c2f78ac",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        496
+      ],
+      "id": "48727a85-ce86-4958-b3f7-bfec05072240",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        672
+      ],
+      "id": "354df668-f29f-4b49-9cb0-f92abf814beb",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.france24.com/fr/rss",
+        "options": {}
+      },
+      "id": "59816b0b-bfec-47d4-87ee-8623ee6eb42c",
+      "name": "france24",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        704
+      ]
     }
   ],
   "pinData": {},
@@ -487,22 +532,11 @@
         ]
       ]
     },
-    "france24": {
-      "main": [
-        [
-          {
-            "node": "rss_combine",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "google_news": {
       "main": [
         [
           {
-            "node": "rss_combine",
+            "node": "Limit",
             "type": "main",
             "index": 0
           }
@@ -580,6 +614,39 @@
       "main": [
         []
       ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "rss_combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "rss_combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "france24": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -587,8 +654,9 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1f95dc31-0168-43fe-8e36-2aed3d683d72",
+  "versionId": "24115644-2b14-4631-806c-3bd0406abaed",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "772570aebb7a0e70ac07a8586605b9724b15d3b61e7c3f7552d7fba18b2352b8"
   },
   "nodeGroups": [],
