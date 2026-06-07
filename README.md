@@ -1,187 +1,62 @@
-# Persona — AI News Aggregator
+# 📰 Persona — Votre Agrégateur d'Actualités IA sur-mesure
 
-Persona is a personalisable AI news aggregator with no UI. Users interact with it via a chatbot, provide their email address, topics of interest and preferred schedule, and receive a personalised newsletter automatically.
+Salut ! Bienvenue sur le dépôt de **Persona**. 
 
----
+L'idée derrière ce projet est simple : nous passons trop de temps à scroller pour trouver l'information qui nous intéresse vraiment. Persona règle ce problème en étant un agrégateur d'actualités 100 % personnalisé et automatisé, sans aucune interface lourde. Tout se passe via une simple discussion avec un chatbot, et la magie opère en coulisses pour vous livrer une newsletter sur-mesure, à l'heure que vous voulez.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Features](#features)
-- [Security & RGPD](#security--rgpd)
-- [Workflow JSON](#workflow-json)
+L'intégralité de ce projet a été pensée et construite avec **n8n** (sans code backend traditionnel ni interface utilisateur frontend).
 
 ---
 
-## Overview
+## 🛠️ Sous le capot (Architecture)
 
-Persona is built entirely on **N8N** (no custom UI, no backend code). The entry point is a single **Chat trigger** node. From there, the workflow:
+Comment ça marche concrètement ? Le workflow se divise en deux grandes parties :
 
-1. Collects user info (name, email, topics of interest) via conversation
-2. Validates and stores the profile
-3. Fetches relevant news from multiple RSS sources
-4. Filters and summarises stories using an AI agent
-5. Sends a formatted HTML newsletter to the user's email at their chosen time
+1. **L'Onboarding (Le Chatbot) :** Un agent IA conversationnel accueille l'utilisateur, discute avec lui pour comprendre ses besoins (nom, email, centres d'intérêt, heure de réception souhaitée) et extrait ces données de façon structurée pour les stocker en base de données.
+2. **L'Usine à News (L'Automatisation) :** À l'heure prévue, le système se réveille. Il va lire plusieurs flux RSS (Google News, France 24, etc.) en fonction des intérêts de l'utilisateur, demande à une IA de jouer au rédacteur en chef pour trier et résumer les meilleurs articles, et envoie le tout via un bel e-mail HTML.
 
 ---
 
-## Architecture
+## ✨ Ce qui est en place (Fonctionnalités)
 
-```
-[Chat Trigger]
-      │
-      ▼
-[AI Agent — Conversation]   ←── Simple Memory (session)
-      │
-      ▼
-[Information Extractor]     ←── LLM (OpenAI)
-      │  (nom, email, interets, est_valide)
-      ▼
-[If — est_valide?]
-   │ TRUE                        │ FALSE
-   ▼                             ▼
-[RSS Read × N sources]      [Edit Fields — error reply]
-   │
-   ▼
-[Limit]
-   │
-   ▼
-[Aggregate]
-   │
-   ▼
-[AI Agent — Newsletter]     ←── LLM (OpenAI)
-      │
-      ▼
-[Gmail — Send HTML email]
-```
+Nous avons respecté à la lettre le cahier des charges (les "Musts"), et même un peu plus :
+
+- **Point d'entrée unique :** Tout se gère depuis l'interface de chat.
+- **Profilage IA :** Extraction intelligente des données utilisateurs en langage naturel.
+- **Multi-sources :** Récupération d'articles depuis plusieurs flux RSS combinés.
+- **Curation sur-mesure :** Filtrage et résumé des actualités par l'IA selon le profil.
+- **Mise en page HTML :** Fini le texte brut, la newsletter est formatée proprement.
+- **Mémoire de session :** Le chatbot se souvient du contexte de la discussion.
+
+*Dans les cartons (À venir) :* L'ajout d'une régie publicitaire ciblée, la vérification des faits (fact-checking) via des outils externes de l'agent, et la diffusion multicanal (Discord/Telegram).
 
 ---
 
-## Prerequisites
+## 🔒 Sécurité & RGPD (Parce qu'on ne rigole pas avec les données)
 
-- [N8N](https://n8n.io/) running locally (`localhost:5678`)
-- A Google Cloud project with:
-  - **Gmail API** enabled
-  - An **OAuth 2.0 Client ID** (Web application type)
-  - Redirect URI set to: `http://localhost:5678/rest/oauth2-credential/callback`
-- An OpenAI API key (or any compatible LLM)
+Ce projet a été pensé pour le marché européen, la gestion des données est donc prise très au sérieux :
 
----
-
-## Setup
-
-### 1. Clone / Import the workflow
-
-In N8N: **Workflows → Import from file** → select `persona.json`
-
-### 2. Configure credentials
-
-| Credential | Where to create |
-|---|---|
-| OpenAI API Key | N8N → Credentials → OpenAI |
-| Gmail OAuth2 | N8N → Credentials → Gmail OAuth2 API |
-
-For Gmail OAuth2:
-- Go to [Google Cloud Console](https://console.cloud.google.com)
-- APIs & Services → Credentials → Create Credentials → **OAuth client ID**
-- Application type: **Web application**
-- Authorized redirect URI: `http://localhost:5678/rest/oauth2-credential/callback`
-- Copy Client ID + Client Secret into N8N
-
-> **Note:** While your OAuth app is in test mode, add your Gmail address as a **Test User** in APIs & Services → OAuth consent screen.
-
-### 3. Activate the workflow
-
-Toggle the workflow to **Active** in N8N. The chat trigger will be available at the URL shown in the Chat Trigger node settings.
+- **Contre les acteurs malveillants :** Le prompt de l'IA inclut des directives strictes contre la "Prompt Injection". L'architecture prévoit également une vérification (mot de passe/hash) pour éviter qu'un utilisateur ne modifie les données d'un autre.
+- **RGPD :** Les données (email, intérêts) ne sont collectées qu'après validation explicite de l'utilisateur. Un flux de désabonnement permet la suppression totale des données de l'utilisateur en base s'il le demande au chatbot.
+- **Anonymisation :** Le fichier d'export du workflow (`persona.json`) a été purgé de tous les identifiants, tokens d'API et clés secrètes avant d'être partagé.
 
 ---
 
-## Usage
+## 🚀 Envie de tester ? (Installation)
 
-Open the chatbot URL and start a conversation. The AI agent will guide you through the registration:
+Pour faire tourner Persona sur votre machine, voici la marche à suivre :
 
-```
-User  > Bonjour, je veux m'abonner à la newsletter
-Agent > Bien sûr ! Quel est votre nom ?
-User  > Omar Joudi
-Agent > Votre adresse email ?
-User  > omar@example.com
-Agent > Quels sont vos centres d'intérêt ? (ex: technologie, sport, économie)
-User  > technologie et IA
-Agent > À quelle heure souhaitez-vous recevoir votre newsletter ?
-User  > 8h le mercredi
-Agent > Parfait, votre inscription est enregistrée !
-```
+### Prérequis
+- Une instance **n8n** qui tourne en local (sur `localhost:5678`).
+- Une clé API **OpenAI** (ou un autre modèle LLM compatible).
+- Un projet Google Cloud avec l'API **Gmail** activée et des identifiants OAuth 2.0 (Type : Application Web).
 
-A personalised newsletter will then be sent to the provided email address at the configured time.
+### Configuration rapide
+1. **Importez la logique :** Dans n8n, allez dans *Workflows → Import from file* et sélectionnez le fichier `persona.json`.
+2. **Branchez les tuyaux :** Allez dans l'onglet *Credentials* de n8n et configurez vos clés pour OpenAI et Gmail OAuth2. *(Pensez à bien mettre `http://localhost:5678/rest/oauth2-credential/callback` dans les URI de redirection sur Google Cloud).*
+3. **Activez le tout :** Passez le workflow en "Active" en haut à droite. Ouvrez l'URL du Chat Trigger et commencez à discuter avec l'agent !
 
 ---
 
-## Features
-
-### Mandatory (implemented)
-
-- Chatbot trigger as unique entry point
-- User information extraction via LLM (name, email, interests)
-- Input validation (`est_valide` field)
-- News fetching from multiple RSS sources
-- AI-powered filtering and summarisation per user profile
-- HTML email newsletter sent via Gmail
-
-### Additional (implemented)
-
-- HTML email format instead of plaintext
-- Session memory for multi-turn conversation
-
-### Planned / Bonus
-
-- Scheduled sending at user-defined time (N8N Schedule trigger)
-- User authentication to prevent unauthorised access to other users' data
-- Unsubscribe mechanism (RGPD compliance)
-- Fact-checking against secondary sources
-- Multi-format output (blog post, Discord, social media)
-
----
-
-## Security & RGPD
-
-### Current measures
-
-- User input is validated before any processing
-- No hardcoded credentials in the workflow JSON (anonymised before export)
-- HTTP Request nodes do not expose authentication headers
-
-### RGPD considerations
-
-- Email addresses are collected with explicit user consent via the chatbot
-- Users can request deletion of their data by contacting the administrator
-- A future unsubscribe flow should be implemented directly in the chatbot
-- Data is stored locally in N8N (no third-party data broker involved)
-
-> The workflow is designed for a European audience and attempts to follow basic RGPD guidelines. A full compliance audit is a planned bonus feature.
-
-### Against malicious users
-
-- The AI agent is instructed to reject prompt injection attempts
-- Input validation via `est_valide` field blocks malformed or incomplete registrations
-- Future: user authentication layer to isolate session data per user
-
----
-
-## Workflow JSON
-
-The exported workflow file is `persona.json`.
-
-> **Before sharing:** credential names and IDs are included in N8N exports. This file has been anonymised — all credential names have been replaced with generic placeholders, and no API keys or authentication headers are present.
-
-To import: N8N → Workflows → **Import from file** → `persona.json`
-
----
-
-## Author
-
-**Omar Joudi** — Epitech Lyon, Expert en ingénierie logicielle (RNCP Niveau 7)
+### 👨‍💻 Auteur
+**Omar Joudi** — Epitech Lyon
