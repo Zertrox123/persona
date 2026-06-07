@@ -1,4 +1,4 @@
-# Persona — Agrégateur d'Actualités IA sur-mesure
+# Persona
 
 Salut et bienvenue sur le dépôt de Persona. 
 
@@ -20,7 +20,7 @@ Ce prototype couvre les exigences principales du projet :
 
 ---
 
-## Guide d'installation et de configuration (Setup)
+## Guide d'installation et de configuration
 
 Pour que ce workflow fonctionne sur votre machine, il a besoin de se connecter à trois éléments extérieurs : une mémoire (la base de données), un cerveau (OpenAI), et un facteur (Gmail). Le fichier d'export ayant été anonymisé pour des raisons de sécurité, vous devrez fournir vos propres clés.
 
@@ -38,7 +38,7 @@ Le projet utilise des nœuds PostgreSQL pour stocker les profils. La méthode re
 3. Allez dans les paramètres de base de données de Supabase pour récupérer vos identifiants de connexion (l'URL du Host et l'utilisateur). Privilégiez l'adresse de "Connection pooling" avec le port 6543.
 4. Dans n8n, ouvrez un des nœuds Postgres, créez un nouveau "Credential" et collez vos informations. Point crucial : n'oubliez pas d'activer l'option "Ignore SSL Issues" tout en bas de la fenêtre de configuration n8n pour autoriser la connexion.
 
-### 3. Connecter l'IA (OpenAI)
+### 3. Connecter l'IA
 1. Connectez-vous à votre espace développeur OpenAI et générez une nouvelle clé API (Secret Key).
 2. Dans n8n, allez dans l'onglet Credentials, cherchez "OpenAI API" et collez votre clé. 
 3. Retournez dans le workflow et assurez-vous que les deux nœuds "OpenAI Model" utilisent bien ce nouveau credential.
@@ -58,4 +58,4 @@ Une fois tous les identifiants au vert, activez le workflow en haut à droite de
 
 ## Auteur
 
-**Omar Joudi** — Epitech Lyon, Expert en ingénierie logicielle (RNCP Niveau 7)
+**Omar Joudi**
