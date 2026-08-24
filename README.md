@@ -1,15 +1,7 @@
 # Persona AI
 
-Modèles décisionnels et arbres d'états comportementaux pour agents conversationnels.
+Modèle de prise de décision et arbre d'états pour un agent conversationnel en Python.
 
-## Présentation
+Définit une personnalité, de la mémoire contextuelle et des règles d'adaptation selon les inputs de l'utilisateur.
 
-Projet d'intelligence artificielle (G-AIA-410) structurant des profils de personnalité et des graphes de décision pour des interactions conversationnelles cohérentes et adaptatives.
-
-Composants :
-- Définition déclarative de la personnalité, de la mémoire contextuelle et des objectifs de l'agent.
-- Arbres décisionnels évaluant les intentions utilisateur et adaptant le registre de réponse.
-
-## Fichiers de Configuration
-
-- `Persona final (1).json` : Définition des états, règles comportementales et transitions de l'agent.
+Voir `Persona final (1).json` pour la configuration des états et des règles.
