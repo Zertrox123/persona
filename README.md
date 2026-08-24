@@ -1,16 +1,15 @@
 # Persona AI
 
-Conversational decision models and agent behavior profiles.
+Modèles décisionnels et arbres d'états comportementaux pour agents conversationnels.
 
-## Overview
+## Présentation
 
-NLP and conversational state machine managing personality profiles, context trees, and automated decision evaluation.
+Projet d'intelligence artificielle (G-AIA-410) structurant des profils de personnalité et des graphes de décision pour des interactions conversationnelles cohérentes et adaptatives.
 
-## Getting Started
+Composants :
+- Définition déclarative de la personnalité, de la mémoire contextuelle et des objectifs de l'agent.
+- Arbres décisionnels évaluant les intentions utilisateur et adaptant le registre de réponse.
 
-### Usage
+## Fichiers de Configuration
 
-```bash
-# Inspect persona configuration
-cat "Persona final (1).json"
-```
+- `Persona final (1).json` : Définition des états, règles comportementales et transitions de l'agent.
